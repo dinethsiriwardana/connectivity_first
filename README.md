@@ -159,8 +159,6 @@ Contributions welcome! Please open issues for feature requests or bugs. Basic wo
 4. Run `flutter test` and verify the example
 5. Open a pull request
 
-Consider adding a `CODE_OF_CONDUCT.md` for community guidelines.
-
 ---
 
 ## Changelog

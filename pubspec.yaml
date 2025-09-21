@@ -1,0 +1,36 @@
+name: connectivity_first
+description: "connectivity_first utilities for Flutter: automatic connectivity detection, robust local-first data handling, and BLoC-friendly helpers for resilient UI state management."
+version: 1.0.0
+
+homepage: https://github.com/dinethsiriwardana/offline_first
+repository: https://github.com/dinethsiriwardana/offline_first
+issue_tracker: https://github.com/dinethsiriwardana/offline_first/issues
+documentation: https://github.com/dinethsiriwardana/offline_first#readme
+
+topics:
+  - offline
+  - connectivity
+  - bloc
+  - networking
+  - realtime-connectivity
+
+environment:
+  sdk: ^3.8.1
+  flutter: ">=1.17.0"
+
+dependencies:
+  bloc: ^9.0.0
+  connectivity_plus: ^7.0.0
+  equatable: ^2.0.7
+  flutter:
+    sdk: flutter
+  flutter_bloc: ^9.1.1
+  logger: ^2.6.1
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^5.0.0
+
+  integration_test:
+    sdk: flutter

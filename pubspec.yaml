@@ -2,10 +2,10 @@ name: connectivity_first
 description: "connectivity_first utilities for Flutter: automatic connectivity detection, robust local-first data handling, and BLoC-friendly helpers for resilient UI state management."
 version: 1.0.0
 
-homepage: https://github.com/dinethsiriwardana/offline_first
-repository: https://github.com/dinethsiriwardana/offline_first
-issue_tracker: https://github.com/dinethsiriwardana/offline_first/issues
-documentation: https://github.com/dinethsiriwardana/offline_first#readme
+homepage: https://github.com/dinethsiriwardana/connectivity_first
+repository: https://github.com/dinethsiriwardana/connectivity_first
+issue_tracker: https://github.com/dinethsiriwardana/connectivity_first/issues
+documentation: https://github.com/dinethsiriwardana/connectivity_first#readme
 
 topics:
   - offline

@@ -1,5 +1,3 @@
-library offline_first;
-
 // Export connectivity service
 export 'src/services/connectivity_service.dart';
 
@@ -21,3 +19,6 @@ export 'src/widgets/connectivity_first_app.dart';
 // Export connectivity commands utility
 export 'src/services/global_connectivity_manager.dart'
     show ConnectivityFirstCommand;
+
+// Export WASM-compatible logger utility
+export 'src/utils/connectivity_logger.dart';

@@ -1,6 +1,6 @@
 import 'dart:async';
 import 'package:connectivity_plus/connectivity_plus.dart';
-import 'package:logger/logger.dart';
+import 'package:connectivity_first/src/utils/connectivity_logger.dart';
 
 /// Service for managing connectivity status and providing a centralized
 /// way to monitor network connectivity across the application
@@ -11,7 +11,7 @@ class ConnectivityFirstService {
   ConnectivityFirstService._internal();
 
   final Connectivity _connectivity = Connectivity();
-  final Logger _logger = Logger();
+  final ConnectivityLogger _logger = ConnectivityLogger();
   StreamSubscription<List<ConnectivityResult>>? _subscription;
   Timer? _periodicTimer;
 

@@ -10,6 +10,7 @@ This package helps Flutter apps detect online/offline state, react to connectivi
 
 Key features:
 
+- **WebAssembly (WASM) compatible** - Full support for Flutter web WASM builds
 - Global connectivity monitoring using a provider widget
 - A simple `ConnectivityFirstApp` widget that rebuilds based on connectivity
 - Programmatic commands to check status, restart monitoring, and start/stop periodic checks

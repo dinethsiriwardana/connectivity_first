@@ -1,6 +1,6 @@
 name: connectivity_first
 description: "connectivity_first utilities for Flutter: automatic connectivity detection, robust local-first data handling, and BLoC-friendly helpers for resilient UI state management."
-version: 1.0.0
+version: 1.0.1
 
 homepage: https://github.com/dinethsiriwardana/connectivity_first
 repository: https://github.com/dinethsiriwardana/connectivity_first
@@ -25,7 +25,6 @@ dependencies:
   flutter:
     sdk: flutter
   flutter_bloc: ^9.1.1
-  logger: ^2.6.1
 
 dev_dependencies:
   flutter_test:

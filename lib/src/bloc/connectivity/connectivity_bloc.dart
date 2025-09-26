@@ -2,8 +2,8 @@ import 'dart:async';
 
 import 'package:bloc/bloc.dart';
 import 'package:connectivity_first/src/services/connectivity_service.dart';
+import 'package:connectivity_first/src/utils/connectivity_logger.dart';
 import 'package:equatable/equatable.dart';
-import 'package:logger/logger.dart';
 
 part 'connectivity_event.dart';
 part 'connectivity_state.dart';
@@ -11,7 +11,7 @@ part 'connectivity_state.dart';
 class ConnectivityFirstBloc
     extends Bloc<ConnectivityFirstEvent, ConnectivityFirstState> {
   final ConnectivityFirstService _connectivityService;
-  final Logger _logger = Logger();
+  final ConnectivityLogger _logger = ConnectivityLogger();
   StreamSubscription<bool>? _connectivitySubscription;
 
   ConnectivityFirstBloc({ConnectivityFirstService? connectivityService})

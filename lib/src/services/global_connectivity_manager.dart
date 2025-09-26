@@ -1,7 +1,7 @@
 import 'package:connectivity_first/src/bloc/connectivity/connectivity_bloc.dart';
+import 'package:connectivity_first/src/utils/connectivity_logger.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:logger/logger.dart';
 
 /// Global connectivity manager that wraps the entire app
 /// and provides connectivity-based UI management
@@ -26,7 +26,7 @@ class _ConnectivityFirstGlobalManagerState
     extends State<ConnectivityFirstGlobalManager> {
   bool? _previousConnectivityStatus;
 
-  final Logger logger = Logger();
+  final ConnectivityLogger logger = ConnectivityLogger();
 
   @override
   Widget build(BuildContext context) {

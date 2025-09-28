@@ -41,14 +41,14 @@ Minimum supported Flutter SDK: see `pubspec.yaml` in this repo for exact constra
 1. Import the package in your Dart files:
 
 ```dart
-import 'package:connectivity_first/flutter_connectivity_first.dart';
+import 'package:connectivity_first/connectivity_first.dart';
 ```
 
 2. Wrap your app with `ConnectivityFirstProvider` (usually above `MaterialApp`) to enable global monitoring and callbacks:
 
 ```dart
 import 'package:flutter/material.dart';
-import 'package:connectivity_first/flutter_connectivity_first.dart';
+import 'package:connectivity_first/connectivity_first.dart';
 
  return MaterialApp(
       home:
@@ -156,9 +156,10 @@ Contributions welcome! Please open issues for feature requests or bugs. Basic wo
 
 1. Fork the repo
 2. Create a branch: `git checkout -b feature/your-feature`
-3. Make changes and add tests
-4. Run `flutter test` and verify the example
-5. Open a pull request
+3. Make changes
+4. Update the CHANGELOG.md
+5. Run `dart format .`
+6. Open a pull request
 
 ---
 
@@ -178,4 +179,4 @@ MIT — see the `LICENSE` file for details.
 
 - Built with `flutter_bloc`
 - Connectivity detection powered by `connectivity_plus`
-- Logging by `logger`
+- WASM-compatible logging using Flutter's `debugPrint`

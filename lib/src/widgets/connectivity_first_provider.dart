@@ -1,4 +1,5 @@
 import 'package:connectivity_first/src/bloc/connectivity/connectivity_bloc.dart';
+import 'package:connectivity_first/src/bloc/connectivity_quality/connectivity_quality_bloc.dart';
 import 'package:connectivity_first/src/services/global_connectivity_manager.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -16,8 +17,15 @@ class ConnectivityFirstProvider extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (context) => ConnectivityFirstBloc(),
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider(
+          create: (context) => ConnectivityFirstBloc(),
+        ),
+        BlocProvider(
+          create: (context) => ConnectivityQualityBloc(),
+        ),
+      ],
       child: ConnectivityFirstGlobalManager(
         onConnectivityRestored: onConnectivityRestored,
         onConnectivityLost: onConnectivityLost,

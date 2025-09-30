@@ -12,7 +12,8 @@ Key features:
 
 - **WebAssembly (WASM) compatible** - Full support for Flutter web WASM builds
 - Global connectivity monitoring using a provider widget
-- A simple `ConnectivityFirstApp` widget that rebuilds based on connectivity
+- **Connection quality assessment** - Real-time latency-based quality monitoring
+- A simple `ConnectivityFirstApp` widget that rebuilds based on connectivity and quality
 - Programmatic commands to check status, restart monitoring, and start/stop periodic checks
 - Small set of utilities designed to integrate with BLoC or other state management approaches
 
@@ -65,14 +66,14 @@ import 'package:connectivity_first/connectivity_first.dart';
 
 ```
 
-3. Use `ConnectivityFirstApp` somewhere in your widget tree to rebuild UI based on the current connectivity state:
+3. Use `ConnectivityFirstApp` somewhere in your widget tree to rebuild UI based on the current connectivity state and quality:
 
 ```dart
 
   @override
   Widget build(BuildContext context) {
     return ConnectivityFirstApp(
-      builder: (isOnline) => Scaffold(
+      builder: (isOnline, quality) => Scaffold(
         appBar: AppBar(title: const Text('Offline First Example')),
         body: Center(
           child: Column(
@@ -81,6 +82,15 @@ import 'package:connectivity_first/connectivity_first.dart';
               Text(
                 isOnline ? 'You are online' : 'You are offline',
                 style: const TextStyle(fontSize: 18),
+              ),
+              const SizedBox(height: 10),
+              Text(
+                'Connection Quality: ${quality.name}',
+                style: TextStyle(
+                  fontSize: 16,
+                  color: _getQualityColor(quality),
+                  fontWeight: FontWeight.bold,
+                ),
               ),
               const SizedBox(height: 20),
               ElevatedButton(
@@ -94,6 +104,11 @@ import 'package:connectivity_first/connectivity_first.dart';
                   }
                 },
                 child: Text(isOnline ? 'Refresh' : 'Check Connection'),
+              ),
+              const SizedBox(height: 10),
+              ElevatedButton(
+                onPressed: () => ConnectivityQualityCommand.checkQuality(context),
+                child: const Text('Check Quality'),
               ),
             ],
           ),
@@ -135,6 +150,73 @@ service.startPeriodicCheck();
 service.stopPeriodicCheck();
 service.checkConnectivity();
 service.restartListening();
+```
+
+---
+
+## Connection Quality Monitoring
+
+The package now includes connection quality assessment based on latency measurements. This feature provides real-time quality monitoring to help you build adaptive UI experiences.
+
+### Connection Quality Levels
+
+- **`ConnectionQuality.none`** - No connection available
+- **`ConnectionQuality.poor`** - High latency (>600ms)
+- **`ConnectionQuality.fair`** - Moderate latency (300-600ms)
+- **`ConnectionQuality.good`** - Low latency (100-300ms)
+- **`ConnectionQuality.excellent`** - Very low latency (<100ms)
+
+### Quality Commands
+
+Use the connectivity quality command helpers to control quality monitoring:
+
+```dart
+// Check current connection quality (triggers an immediate check)
+ConnectivityQualityCommand.checkQuality(context);
+
+// Start/stop periodic quality checks
+ConnectivityQualityCommand.startPeriodicQualityCheck(context);
+ConnectivityQualityCommand.stopPeriodicQualityCheck(context);
+
+// Restart quality monitoring
+ConnectivityQualityCommand.restartQualityMonitoring(context);
+```
+
+Direct access to the quality service:
+
+```dart
+final service = ConnectivityQualityService();
+final quality = await service.measureConnectionQuality();
+final currentQuality = service.currentQuality;
+
+service.startPeriodicCheck();
+service.stopPeriodicCheck();
+service.restartMonitoring();
+```
+
+### Example: Adaptive UI Based on Quality
+
+```dart
+Widget build(BuildContext context) {
+  return ConnectivityFirstApp(
+    builder: (isOnline, quality) {
+      return Scaffold(
+        body: Column(
+          children: [
+            Text('Status: ${isOnline ? 'Online' : 'Offline'}'),
+            Text('Quality: ${quality.name}'),
+            if (quality == ConnectionQuality.poor)
+              const Text('Slow connection detected. Some features may be limited.')
+            else if (quality == ConnectionQuality.excellent)
+              const Text('Excellent connection! All features available.')
+            else if (quality == ConnectionQuality.none)
+              const Text('No connection. Working in offline mode.'),
+          ],
+        ),
+      );
+    },
+  );
+}
 ```
 
 ---

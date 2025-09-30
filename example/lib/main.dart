@@ -39,12 +39,42 @@ class MyHomePage extends StatelessWidget {
     ConnectivityFirstService().restartListening();
   }
 
+  String _getQualityText(ConnectionQuality quality) {
+    switch (quality) {
+      case ConnectionQuality.none:
+        return 'No Connection';
+      case ConnectionQuality.poor:
+        return 'Poor';
+      case ConnectionQuality.fair:
+        return 'Fair';
+      case ConnectionQuality.good:
+        return 'Good';
+      case ConnectionQuality.excellent:
+        return 'Excellent';
+    }
+  }
+
+  Color _getQualityColor(ConnectionQuality quality) {
+    switch (quality) {
+      case ConnectionQuality.none:
+        return Colors.red;
+      case ConnectionQuality.poor:
+        return Colors.orange;
+      case ConnectionQuality.fair:
+        return Colors.yellow;
+      case ConnectionQuality.good:
+        return Colors.lightGreen;
+      case ConnectionQuality.excellent:
+        return Colors.green;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text('Offline First Example')),
       body: ConnectivityFirstApp(
-        builder: (isOnline) => Container(
+        builder: (isOnline, quality) => Container(
           alignment: Alignment.center,
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -53,6 +83,16 @@ class MyHomePage extends StatelessWidget {
                 isOnline ? 'You are online' : 'You are offline',
                 textAlign: TextAlign.center,
                 style: const TextStyle(fontSize: 18),
+              ),
+              const SizedBox(height: 10),
+              Text(
+                'Connection Quality: ${_getQualityText(quality)}',
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: 16,
+                  color: _getQualityColor(quality),
+                  fontWeight: FontWeight.bold,
+                ),
               ),
               const SizedBox(height: 20),
               ElevatedButton(
@@ -66,6 +106,11 @@ class MyHomePage extends StatelessWidget {
                   }
                 },
                 child: Text(isOnline ? 'Refresh' : 'Check Connection'),
+              ),
+              const SizedBox(height: 10),
+              ElevatedButton(
+                onPressed: () => ConnectivityQualityCommand.checkQuality(context),
+                child: const Text('Check Quality'),
               ),
               if (!isOnline) ...[
                 const SizedBox(height: 10),

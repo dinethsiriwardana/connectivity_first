@@ -1,4 +1,5 @@
 import 'package:connectivity_first/src/bloc/connectivity/connectivity_bloc.dart';
+import 'package:connectivity_first/src/bloc/connectivity_quality/connectivity_quality_bloc.dart';
 import 'package:connectivity_first/src/utils/connectivity_logger.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -36,7 +37,7 @@ class _ConnectivityFirstGlobalManagerState
       },
       child: BlocBuilder<ConnectivityFirstBloc, ConnectivityFirstState>(
         builder: (context, state) {
-          return Stack(children: [widget.child]);
+          return widget.child;
         },
       ),
     );
@@ -118,5 +119,28 @@ class ConnectivityFirstCommand {
   /// Restart connectivity monitoring (useful for troubleshooting)
   static void restartConnectivity(BuildContext context) {
     context.read<ConnectivityFirstBloc>().restartConnectivity();
+  }
+}
+
+/// Sample connectivity quality commands that you can use throughout your app
+class ConnectivityQualityCommand {
+  /// Trigger a manual quality check
+  static void checkQuality(BuildContext context) {
+    context.read<ConnectivityQualityBloc>().checkQuality();
+  }
+
+  /// Start periodic quality monitoring
+  static void startPeriodicQualityCheck(BuildContext context) {
+    context.read<ConnectivityQualityBloc>().startPeriodicCheck();
+  }
+
+  /// Stop periodic quality monitoring
+  static void stopPeriodicQualityCheck(BuildContext context) {
+    context.read<ConnectivityQualityBloc>().stopPeriodicCheck();
+  }
+
+  /// Restart quality monitoring (useful for troubleshooting)
+  static void restartQualityMonitoring(BuildContext context) {
+    context.read<ConnectivityQualityBloc>().restartMonitoring();
   }
 }

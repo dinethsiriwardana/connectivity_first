@@ -11,8 +11,9 @@ This package helps Flutter apps detect online/offline state, react to connectivi
 Key features:
 
 - **WebAssembly (WASM) compatible** - Full support for Flutter web WASM builds
+- **Auto-enabled by default** - Both connectivity and quality monitoring start automatically
 - Global connectivity monitoring using a provider widget
-- **Connection quality assessment** - Real-time latency-based quality monitoring
+- **Connection quality assessment** - Real-time latency-based quality monitoring with configurable intervals
 - A simple `ConnectivityFirstApp` widget that rebuilds based on connectivity and quality
 - Programmatic commands to check status, restart monitoring, and start/stop periodic checks
 - Small set of utilities designed to integrate with BLoC or other state management approaches
@@ -63,6 +64,64 @@ import 'package:connectivity_first/connectivity_first.dart';
         builder: const MyHomePage(),
       ),
     );
+
+```
+
+---
+
+## Configuration Options
+
+The `ConnectivityFirstProvider` offers several configuration options to customize behavior:
+
+### Auto-Enable Services (New!)
+
+By default, both connectivity monitoring and connection quality monitoring are automatically enabled when you wrap your app with `ConnectivityFirstProvider`. You can control this behavior:
+
+```dart
+ConnectivityFirstProvider(
+  // Automatically enable connectivity monitoring (default: true)
+  autoEnableConnectivity: true,
+  
+  // Automatically enable quality monitoring (default: true)
+  autoEnableQualityMonitoring: true,
+  
+  // Custom interval for quality checks (default: 10 seconds)
+  qualityCheckInterval: const Duration(seconds: 5),
+  
+  onConnectivityRestored: () => print('Internet restored!'),
+  onConnectivityLost: () => print('Internet lost!'),
+  builder: const MyHomePage(),
+)
+```
+
+### Configuration Examples
+
+**Minimal setup (everything auto-enabled):**
+```dart
+ConnectivityFirstProvider(
+  builder: MyApp(), // Both services start automatically
+)
+```
+
+**Custom quality check interval:**
+```dart
+ConnectivityFirstProvider(
+  qualityCheckInterval: const Duration(seconds: 30), // Check every 30 seconds
+  builder: MyApp(),
+)
+```
+
+**Selective auto-enabling:**
+```dart
+ConnectivityFirstProvider(
+  autoEnableConnectivity: false,          // Manual connectivity control
+  autoEnableQualityMonitoring: true,      // Auto-start quality monitoring
+  qualityCheckInterval: const Duration(minutes: 1), // Check every minute
+  builder: MyApp(),
+)
+```
+
+---
 
 ```
 
@@ -217,6 +276,38 @@ Widget build(BuildContext context) {
     },
   );
 }
+```
+
+---
+
+## Migration Guide
+
+### Upgrading from 1.0.x to 2.0.0
+
+**Breaking Change**: The `ConnectivityFirstApp` builder function signature has changed to include connection quality.
+
+**Before (1.0.x):**
+```dart
+ConnectivityFirstApp(
+  builder: (isOnline) => YourWidget(isOnline: isOnline),
+)
+```
+
+**After (2.0.0):**
+```dart
+ConnectivityFirstApp(
+  builder: (isOnline, quality) => YourWidget(
+    isOnline: isOnline,
+    quality: quality,
+  ),
+)
+```
+
+If you don't need quality monitoring, you can simply ignore the `quality` parameter:
+```dart
+ConnectivityFirstApp(
+  builder: (isOnline, _) => YourWidget(isOnline: isOnline),
+)
 ```
 
 ---

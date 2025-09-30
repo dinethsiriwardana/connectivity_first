@@ -14,6 +14,15 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       home: ConnectivityFirstProvider(
+        // Automatically enable connectivity monitoring (default: true)
+        autoEnableConnectivity: true,
+
+        // Automatically enable quality monitoring (default: true)
+        autoEnableQualityMonitoring: true,
+
+        // Custom interval for quality checks (default: 10 seconds)
+        qualityCheckInterval: const Duration(seconds: 5),
+
         onConnectivityRestored: () {
           print('Internet restored!');
         },
@@ -109,7 +118,8 @@ class MyHomePage extends StatelessWidget {
               ),
               const SizedBox(height: 10),
               ElevatedButton(
-                onPressed: () => ConnectivityQualityCommand.checkQuality(context),
+                onPressed: () =>
+                    ConnectivityQualityCommand.checkQuality(context),
                 child: const Text('Check Quality'),
               ),
               if (!isOnline) ...[

@@ -15,9 +15,9 @@ class ConnectivityQualityState extends Equatable {
 
   /// Initial state
   const ConnectivityQualityState.initial()
-      : quality = ConnectionQuality.none,
-        isLoading = false,
-        error = null;
+    : quality = ConnectionQuality.none,
+      isLoading = false,
+      error = null;
 
   /// Loading state
   ConnectivityQualityState copyWithLoading() {

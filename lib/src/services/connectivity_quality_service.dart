@@ -3,24 +3,19 @@ import 'package:connectivity_first/src/utils/connectivity_logger.dart';
 import 'package:http/http.dart' as http;
 
 /// Enum to represent different connection quality levels
-enum ConnectionQuality {
-  none,
-  poor,
-  fair,
-  good,
-  excellent,
-}
+enum ConnectionQuality { none, poor, fair, good, excellent }
 
 /// Service for measuring and monitoring connection quality
 /// Provides latency-based quality assessment and periodic monitoring
 class ConnectivityQualityService {
   static final ConnectivityQualityService _instance =
       ConnectivityQualityService._internal();
-  factory ConnectivityQualityService() => _instance;
+  factory ConnectivityQualityService({Duration? checkInterval}) => _instance;
   ConnectivityQualityService._internal();
 
   final ConnectivityLogger _logger = ConnectivityLogger();
   Timer? _periodicTimer;
+  Duration _checkInterval = const Duration(seconds: 10);
 
   // Stream controller for broadcasting connectivity quality status
   final StreamController<ConnectionQuality> _qualityController =
@@ -36,8 +31,13 @@ class ConnectivityQualityService {
   ConnectionQuality get currentQuality => _currentQuality;
 
   /// Initialize the connectivity quality service and start monitoring
-  Future<void> initialize() async {
+  /// [checkInterval] allows customizing the periodic check interval
+  Future<void> initialize({Duration? checkInterval}) async {
     // _logger.i('Initializing ConnectivityQualityService');
+
+    if (checkInterval != null) {
+      _checkInterval = checkInterval;
+    }
 
     // Check initial connection quality
     await _checkInitialQuality();
@@ -58,20 +58,18 @@ class ConnectivityQualityService {
     }
   }
 
-  /// Start periodic connection quality check every 10 seconds
+  /// Start periodic connection quality check with configurable interval
   void _startPeriodicCheck() {
     _periodicTimer?.cancel(); // Cancel any existing timer
 
-    _periodicTimer = Timer.periodic(const Duration(seconds: 10), (timer) async {
+    _periodicTimer = Timer.periodic(_checkInterval, (timer) async {
       try {
         final quality = await measureConnectionQuality();
         _logger.i('Periodic quality check (${DateTime.now()}): $quality');
 
         // Update quality if it changed
         if (_currentQuality != quality) {
-          _logger.i(
-            'Connection quality changed: $_currentQuality -> $quality',
-          );
+          _logger.i('Connection quality changed: $_currentQuality -> $quality');
           _currentQuality = quality;
           _qualityController.add(_currentQuality);
         }
@@ -80,18 +78,17 @@ class ConnectivityQualityService {
       }
     });
 
-    // _logger.i('Started periodic connection quality check (every 10 seconds)');
+    // _logger.i('Started periodic connection quality check (every ${_checkInterval.inSeconds} seconds)');
   }
 
   /// Measure connection quality based on latency
   Future<ConnectionQuality> measureConnectionQuality() async {
     try {
-
       final stopwatch = Stopwatch()..start();
 
-      final response = await http.get(
-        Uri.parse('https://www.google.com/generate_204'),
-      ).timeout(const Duration(seconds: 10));
+      final response = await http
+          .get(Uri.parse('https://www.google.com/generate_204'))
+          .timeout(const Duration(seconds: 10));
 
       stopwatch.stop();
       final latency = stopwatch.elapsedMilliseconds;
@@ -155,4 +152,16 @@ class ConnectivityQualityService {
     _logger.i('Restarting quality monitoring');
     _startPeriodicCheck();
   }
+
+  /// Update the check interval and restart monitoring if active
+  void updateCheckInterval(Duration newInterval) {
+    _checkInterval = newInterval;
+    if (_periodicTimer?.isActive == true) {
+      _logger.i('Updating check interval to ${newInterval.inSeconds} seconds');
+      _startPeriodicCheck(); // Restart with new interval
+    }
+  }
+
+  /// Get the current check interval
+  Duration get checkInterval => _checkInterval;
 }

@@ -5,6 +5,36 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.0.0] - 2025-09-30
+
+### Added
+- **Connection Quality Monitoring**: New feature for real-time latency-based quality assessment
+  - `ConnectivityQualityService` for measuring connection quality using HTTP requests to Google's generate_204 endpoint
+  - `ConnectivityQualityBloc` for state management of quality monitoring
+  - Five quality levels: `none`, `poor`, `fair`, `good`, `excellent` based on latency thresholds
+  - `ConnectivityQualityCommand` utility class for easy quality management throughout the app
+  - Periodic quality monitoring with automatic quality updates
+  - Quality-aware `ConnectivityFirstApp` widget that now provides both connectivity status and quality to builder function
+- **Auto-Enable Configuration**: New automatic service initialization options
+  - `autoEnableConnectivity` parameter in `ConnectivityFirstProvider` (default: `true`)
+  - `autoEnableQualityMonitoring` parameter in `ConnectivityFirstProvider` (default: `true`)
+  - Both connectivity and quality monitoring now start automatically by default
+- **Configurable Quality Check Interval**: 
+  - `qualityCheckInterval` parameter in `ConnectivityFirstProvider` (default: 10 seconds)
+  - `updateCheckInterval()` method in `ConnectivityQualityService` for dynamic interval changes
+  - Support for custom intervals from seconds to minutes
+
+### Changed
+- **Breaking Change**: `ConnectivityFirstApp` builder function signature changed from `(bool isOnline)` to `(bool isOnline, ConnectionQuality quality)`
+- `ConnectivityFirstProvider` now uses `MultiBlocProvider` to provide both connectivity and quality blocs
+- `ConnectivityFirstGlobalManager` enhanced with auto-enable functionality and service initialization
+- `ConnectivityQualityService` now accepts configurable check intervals
+- Updated example app to demonstrate new configuration options and quality monitoring features
+- Enhanced README with comprehensive configuration documentation and examples
+
+### Dependencies
+- Added `http: ^2.0.0` dependency for quality measurement HTTP requests
+
 ## [1.0.2] - 2025-09-28
 
 ### Fixed

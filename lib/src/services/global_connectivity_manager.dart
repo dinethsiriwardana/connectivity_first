@@ -1,4 +1,5 @@
 import 'package:connectivity_first/src/bloc/connectivity/connectivity_bloc.dart';
+import 'package:connectivity_first/src/bloc/connectivity_quality/connectivity_quality_bloc.dart';
 import 'package:connectivity_first/src/utils/connectivity_logger.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -9,12 +10,16 @@ class ConnectivityFirstGlobalManager extends StatefulWidget {
   final Widget child;
   final Function()? onConnectivityRestored;
   final Function()? onConnectivityLost;
+  final bool autoEnableConnectivity;
+  final bool autoEnableQualityMonitoring;
 
   const ConnectivityFirstGlobalManager({
     super.key,
     required this.child,
     this.onConnectivityRestored,
     this.onConnectivityLost,
+    this.autoEnableConnectivity = true,
+    this.autoEnableQualityMonitoring = true,
   });
 
   @override
@@ -29,6 +34,39 @@ class _ConnectivityFirstGlobalManagerState
   final ConnectivityLogger logger = ConnectivityLogger();
 
   @override
+  void initState() {
+    super.initState();
+
+    // Auto-enable services after the first frame
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) {
+        _autoEnableServices();
+      }
+    });
+  }
+
+  /// Automatically enable connectivity and quality monitoring services based on configuration
+  void _autoEnableServices() {
+    if (widget.autoEnableConnectivity) {
+      try {
+        context.read<ConnectivityFirstBloc>().startPeriodicCheck();
+        logger.i('Auto-enabled connectivity monitoring');
+      } catch (e) {
+        logger.w('Failed to auto-enable connectivity monitoring: $e');
+      }
+    }
+
+    if (widget.autoEnableQualityMonitoring) {
+      try {
+        context.read<ConnectivityQualityBloc>().startPeriodicCheck();
+        logger.i('Auto-enabled quality monitoring');
+      } catch (e) {
+        logger.w('Failed to auto-enable quality monitoring: $e');
+      }
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
     return BlocListener<ConnectivityFirstBloc, ConnectivityFirstState>(
       listener: (context, state) {
@@ -36,7 +74,7 @@ class _ConnectivityFirstGlobalManagerState
       },
       child: BlocBuilder<ConnectivityFirstBloc, ConnectivityFirstState>(
         builder: (context, state) {
-          return Stack(children: [widget.child]);
+          return widget.child;
         },
       ),
     );
@@ -118,5 +156,28 @@ class ConnectivityFirstCommand {
   /// Restart connectivity monitoring (useful for troubleshooting)
   static void restartConnectivity(BuildContext context) {
     context.read<ConnectivityFirstBloc>().restartConnectivity();
+  }
+}
+
+/// Sample connectivity quality commands that you can use throughout your app
+class ConnectivityQualityCommand {
+  /// Trigger a manual quality check
+  static void checkQuality(BuildContext context) {
+    context.read<ConnectivityQualityBloc>().checkQuality();
+  }
+
+  /// Start periodic quality monitoring
+  static void startPeriodicQualityCheck(BuildContext context) {
+    context.read<ConnectivityQualityBloc>().startPeriodicCheck();
+  }
+
+  /// Stop periodic quality monitoring
+  static void stopPeriodicQualityCheck(BuildContext context) {
+    context.read<ConnectivityQualityBloc>().stopPeriodicCheck();
+  }
+
+  /// Restart quality monitoring (useful for troubleshooting)
+  static void restartQualityMonitoring(BuildContext context) {
+    context.read<ConnectivityQualityBloc>().restartMonitoring();
   }
 }

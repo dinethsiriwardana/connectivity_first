@@ -81,7 +81,9 @@ class ConnectivityFirstService {
     _periodicTimer = Timer.periodic(const Duration(seconds: 5), (timer) async {
       try {
         final results = await _connectivity.checkConnectivity();
-        _logger.i('Periodic connectivity check : (${DateTime.now()}): $results');
+        _logger.i(
+          'Periodic connectivity check : (${DateTime.now()}): $results',
+        );
 
         // Also check if the status changed
         final connected = _isConnectedFromResults(results);

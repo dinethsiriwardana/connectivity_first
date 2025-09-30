@@ -123,7 +123,7 @@ ConnectivityFirstProvider(
 
 ---
 
-```
+
 
 3. Use `ConnectivityFirstApp` somewhere in your widget tree to rebuild UI based on the current connectivity state and quality:
 

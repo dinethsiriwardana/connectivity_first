@@ -33,8 +33,6 @@ class ConnectivityQualityService {
   /// Initialize the connectivity quality service and start monitoring
   /// [checkInterval] allows customizing the periodic check interval
   Future<void> initialize({Duration? checkInterval}) async {
-    // _logger.i('Initializing ConnectivityQualityService');
-
     if (checkInterval != null) {
       _checkInterval = checkInterval;
     }
@@ -77,8 +75,6 @@ class ConnectivityQualityService {
         _logger.e('Error during periodic quality check: $e');
       }
     });
-
-    // _logger.i('Started periodic connection quality check (every ${_checkInterval.inSeconds} seconds)');
   }
 
   /// Measure connection quality based on latency

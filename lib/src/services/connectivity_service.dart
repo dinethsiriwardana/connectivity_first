@@ -15,6 +15,8 @@ class ConnectivityFirstService {
   StreamSubscription<List<ConnectivityResult>>? _subscription;
   Timer? _periodicTimer;
 
+  bool _loggerConnectivity = true;
+
   // Stream controller for broadcasting connectivity status
   final StreamController<bool> _connectivityController =
       StreamController<bool>.broadcast();
@@ -29,8 +31,14 @@ class ConnectivityFirstService {
   bool get isConnected => _isConnected;
 
   /// Initialize the connectivity service and start listening
-  Future<void> initialize() async {
-    // _logger.i('Initializing ConnectivityService');
+  Future<void> initialize(bool? loggerConnectivity) async {
+    if (loggerConnectivity != null) {
+      _loggerConnectivity = loggerConnectivity;
+    }
+
+    _logger.setEnabled(_loggerConnectivity);
+
+    _logger.i('Initializing ConnectivityService');
 
     // Check initial connectivity status
     await _checkInitialConnectivity();

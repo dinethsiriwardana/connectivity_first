@@ -17,6 +17,8 @@ class ConnectivityQualityService {
   Timer? _periodicTimer;
   Duration _checkInterval = const Duration(seconds: 10);
 
+  bool _loggerQualityMonitoring = true;
+
   // Stream controller for broadcasting connectivity quality status
   final StreamController<ConnectionQuality> _qualityController =
       StreamController<ConnectionQuality>.broadcast();
@@ -32,10 +34,18 @@ class ConnectivityQualityService {
 
   /// Initialize the connectivity quality service and start monitoring
   /// [checkInterval] allows customizing the periodic check interval
-  Future<void> initialize({Duration? checkInterval}) async {
+  Future<void> initialize({
+    Duration? checkInterval,
+    bool? loggerQualityMonitoring,
+  }) async {
     if (checkInterval != null) {
       _checkInterval = checkInterval;
     }
+    if (loggerQualityMonitoring != null) {
+      _loggerQualityMonitoring = loggerQualityMonitoring;
+    }
+
+    _logger.setEnabled(_loggerQualityMonitoring);
 
     // Check initial connection quality
     await _checkInitialQuality();

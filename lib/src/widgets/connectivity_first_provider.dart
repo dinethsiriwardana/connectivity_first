@@ -18,6 +18,12 @@ class ConnectivityFirstProvider extends StatelessWidget {
   /// Duration for periodic connection quality checks (default: 10 seconds)
   final Duration qualityCheckInterval;
 
+  /// Whether to enable connectivity logging (default: true)
+  final bool loggerConnectivity;
+
+  /// Whether to enable quality monitoring logging (default: true)
+  final bool loggerQualityMonitoring;
+
   const ConnectivityFirstProvider({
     super.key,
     required this.builder,
@@ -25,6 +31,8 @@ class ConnectivityFirstProvider extends StatelessWidget {
     this.onConnectivityLost,
     this.autoEnableConnectivity = true,
     this.autoEnableQualityMonitoring = true,
+    this.loggerConnectivity = true,
+    this.loggerQualityMonitoring = true,
     this.qualityCheckInterval = const Duration(seconds: 10),
   });
 
@@ -32,10 +40,14 @@ class ConnectivityFirstProvider extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiBlocProvider(
       providers: [
-        BlocProvider(create: (context) => ConnectivityFirstBloc()),
+        BlocProvider(
+          create: (context) =>
+              ConnectivityFirstBloc(loggerConnectivity: loggerConnectivity),
+        ),
         BlocProvider(
           create: (context) => ConnectivityQualityBloc(
             qualityCheckInterval: qualityCheckInterval,
+            loggerQualityMonitoring: loggerQualityMonitoring,
           ),
         ),
       ],
@@ -44,6 +56,8 @@ class ConnectivityFirstProvider extends StatelessWidget {
         onConnectivityLost: onConnectivityLost,
         autoEnableConnectivity: autoEnableConnectivity,
         autoEnableQualityMonitoring: autoEnableQualityMonitoring,
+        loggerConnectivity: loggerConnectivity,
+        loggerQualityMonitoring: loggerQualityMonitoring,
         child: builder,
       ),
     );

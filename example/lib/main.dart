@@ -23,6 +23,12 @@ class MyApp extends StatelessWidget {
         // Custom interval for quality checks (default: 10 seconds)
         qualityCheckInterval: const Duration(seconds: 5),
 
+        // Disable connectivity logging (default: true)
+        loggerConnectivity: false,
+
+        // Disable quality monitoring logging (default: true)
+        loggerQualityMonitoring: false,
+
         onConnectivityRestored: () {
           print('Internet restored!');
         },

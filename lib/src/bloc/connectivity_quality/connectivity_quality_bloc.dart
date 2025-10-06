@@ -12,10 +12,12 @@ class ConnectivityQualityBloc
   final ConnectivityLogger _logger = ConnectivityLogger();
   StreamSubscription<ConnectionQuality>? _qualitySubscription;
   final Duration qualityCheckInterval;
+  final bool loggerQualityMonitoring;
 
   ConnectivityQualityBloc({
     ConnectivityQualityService? qualityService,
     this.qualityCheckInterval = const Duration(seconds: 10),
+    this.loggerQualityMonitoring = true,
   }) : _qualityService = qualityService ?? ConnectivityQualityService(),
        super(const ConnectivityQualityState.initial()) {
     on<CheckConnectionQualityEvent>(_onCheckConnectionQuality);
@@ -30,7 +32,10 @@ class ConnectivityQualityBloc
   /// Initialize the quality service and start listening to quality changes
   Future<void> _initializeService() async {
     try {
-      await _qualityService.initialize(checkInterval: qualityCheckInterval);
+      await _qualityService.initialize(
+        checkInterval: qualityCheckInterval,
+        loggerQualityMonitoring: loggerQualityMonitoring,
+      );
       _startListeningToQualityChanges();
     } catch (e) {
       _logger.e('Error initializing ConnectivityQualityService: $e');

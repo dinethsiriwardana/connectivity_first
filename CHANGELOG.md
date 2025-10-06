@@ -5,6 +5,16 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.1.0] - 2025-10-06
+
+### Added
+- **Connectivity Logging Control**: New logging configuration options for better control over debug output
+  - `loggerConnectivity` parameter in `ConnectivityFirstProvider` to enable/disable connectivity logging (default: `true`)
+  - `loggerQualityMonitoring` parameter in `ConnectivityFirstProvider` to enable/disable quality monitoring logging (default: `true`)
+  - Updated `ConnectivityFirstBloc`, `ConnectivityQualityBloc`, and related services to respect logging settings
+  - Enhanced `ConnectivityLogger` utility with configurable logging levels
+  - Improved example app with logging configuration examples
+
 ## [2.0.0] - 2025-09-30
 
 ### Added

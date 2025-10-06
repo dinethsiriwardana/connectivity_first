@@ -29,4 +29,6 @@ export 'src/services/global_connectivity_manager.dart'
     show ConnectivityFirstCommand, ConnectivityQualityCommand;
 
 // Export WASM-compatible logger utility
+// Provides logging capabilities for connectivity and quality monitoring
+// Can be enabled/disabled via loggerConnectivity and loggerQualityMonitoring options
 export 'src/utils/connectivity_logger.dart';

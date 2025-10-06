@@ -12,6 +12,8 @@ class ConnectivityFirstGlobalManager extends StatefulWidget {
   final Function()? onConnectivityLost;
   final bool autoEnableConnectivity;
   final bool autoEnableQualityMonitoring;
+  final bool loggerConnectivity;
+  final bool loggerQualityMonitoring;
 
   const ConnectivityFirstGlobalManager({
     super.key,
@@ -20,6 +22,8 @@ class ConnectivityFirstGlobalManager extends StatefulWidget {
     this.onConnectivityLost,
     this.autoEnableConnectivity = true,
     this.autoEnableQualityMonitoring = true,
+    this.loggerConnectivity = true,
+    this.loggerQualityMonitoring = true,
   });
 
   @override

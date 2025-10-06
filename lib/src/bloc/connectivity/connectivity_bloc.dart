@@ -13,15 +13,18 @@ class ConnectivityFirstBloc
   final ConnectivityFirstService _connectivityService;
   final ConnectivityLogger _logger = ConnectivityLogger();
   StreamSubscription<bool>? _connectivitySubscription;
+  final bool loggerConnectivity;
 
-  ConnectivityFirstBloc({ConnectivityFirstService? connectivityService})
-    : _connectivityService = connectivityService ?? ConnectivityFirstService(),
-      super(
-        const ConnectivityInitial(
-          status: ConnectivityFirstStatus.online,
-          isLocalMode: false,
-        ),
-      ) {
+  ConnectivityFirstBloc({
+    ConnectivityFirstService? connectivityService,
+    this.loggerConnectivity = true,
+  }) : _connectivityService = connectivityService ?? ConnectivityFirstService(),
+       super(
+         const ConnectivityInitial(
+           status: ConnectivityFirstStatus.online,
+           isLocalMode: false,
+         ),
+       ) {
     // Register event handlers
     on<ConnectivityChanged>(_onConnectivityChanged);
     on<ConnectivityCheckRequested>(_onConnectivityCheckRequested);
@@ -36,7 +39,7 @@ class ConnectivityFirstBloc
   Future<void> _initializeConnectivity() async {
     try {
       // Initialize the connectivity service
-      await _connectivityService.initialize();
+      await _connectivityService.initialize(loggerConnectivity);
 
       // Start listening to connectivity changes
       _startListening();

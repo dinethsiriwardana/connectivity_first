@@ -24,6 +24,10 @@ class ConnectivityFirstProvider extends StatelessWidget {
   /// Whether to enable quality monitoring logging (default: true)
   final bool loggerQualityMonitoring;
 
+  /// Duration to wait before confirming a connectivity state change (default: 3 seconds)
+  /// This prevents flickering when connection briefly drops and recovers
+  final Duration connectionStabilityDelay;
+
   const ConnectivityFirstProvider({
     super.key,
     required this.builder,
@@ -34,6 +38,7 @@ class ConnectivityFirstProvider extends StatelessWidget {
     this.loggerConnectivity = true,
     this.loggerQualityMonitoring = true,
     this.qualityCheckInterval = const Duration(seconds: 10),
+    this.connectionStabilityDelay = const Duration(seconds: 3),
   });
 
   @override
@@ -42,7 +47,10 @@ class ConnectivityFirstProvider extends StatelessWidget {
       providers: [
         BlocProvider(
           create: (context) =>
-              ConnectivityFirstBloc(loggerConnectivity: loggerConnectivity),
+              ConnectivityFirstBloc(
+                loggerConnectivity: loggerConnectivity,
+                connectionStabilityDelay: connectionStabilityDelay,
+              ),
         ),
         BlocProvider(
           create: (context) => ConnectivityQualityBloc(

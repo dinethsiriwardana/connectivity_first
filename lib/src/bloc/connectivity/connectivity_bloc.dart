@@ -14,10 +14,13 @@ class ConnectivityFirstBloc
   final ConnectivityLogger _logger = ConnectivityLogger();
   StreamSubscription<bool>? _connectivitySubscription;
   final bool loggerConnectivity;
+  final Duration connectionStabilityDelay;
+  Timer? _pendingOfflineTimer;
 
   ConnectivityFirstBloc({
     ConnectivityFirstService? connectivityService,
     this.loggerConnectivity = true,
+    this.connectionStabilityDelay = const Duration(seconds: 3),
   }) : _connectivityService = connectivityService ?? ConnectivityFirstService(),
        super(
          const ConnectivityInitial(
@@ -79,16 +82,34 @@ class ConnectivityFirstBloc
 
     final isLocalMode = !event.isConnected;
 
-    if (state is ConnectivityInitial) {
-      emit(ConnectivityUpdated(status: status, isLocalMode: isLocalMode));
-    } else if (state is ConnectivityUpdated) {
-      final currentState = state as ConnectivityUpdated;
+    if (event.isConnected) {
+      // Going online: cancel any pending offline timer and emit immediately
+      _pendingOfflineTimer?.cancel();
+      _pendingOfflineTimer = null;
 
-      // Only emit if the state actually changed
-      if (currentState.status != status ||
-          currentState.isLocalMode != isLocalMode) {
-        emit(currentState.copyWith(status: status, isLocalMode: isLocalMode));
+      if (state is ConnectivityInitial) {
+        emit(ConnectivityUpdated(status: status, isLocalMode: isLocalMode));
+      } else if (state is ConnectivityUpdated) {
+        final currentState = state as ConnectivityUpdated;
+        if (currentState.status != status ||
+            currentState.isLocalMode != isLocalMode) {
+          emit(currentState.copyWith(status: status, isLocalMode: isLocalMode));
+        }
       }
+    } else {
+      // Going offline: start delay timer
+      _pendingOfflineTimer?.cancel();
+      _pendingOfflineTimer = Timer(connectionStabilityDelay, () {
+        if (state is ConnectivityInitial) {
+          emit(ConnectivityUpdated(status: status, isLocalMode: isLocalMode));
+        } else if (state is ConnectivityUpdated) {
+          final currentState = state as ConnectivityUpdated;
+          if (currentState.status != status ||
+              currentState.isLocalMode != isLocalMode) {
+            emit(currentState.copyWith(status: status, isLocalMode: isLocalMode));
+          }
+        }
+      });
     }
   }
 
@@ -177,6 +198,7 @@ class ConnectivityFirstBloc
   @override
   Future<void> close() {
     _connectivitySubscription?.cancel();
+    _pendingOfflineTimer?.cancel();
     return super.close();
   }
 }

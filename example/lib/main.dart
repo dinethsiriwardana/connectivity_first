@@ -23,6 +23,9 @@ class MyApp extends StatelessWidget {
         // Custom interval for quality checks (default: 10 seconds)
         qualityCheckInterval: const Duration(seconds: 5),
 
+        // Delay before confirming offline state (default: 3 seconds)
+        connectionStabilityDelay: const Duration(seconds: 5),
+
         // Disable connectivity logging (default: true)
         loggerConnectivity: true,
 

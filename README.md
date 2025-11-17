@@ -12,6 +12,8 @@ Key features:
 
 - **WebAssembly (WASM) compatible** - Full support for Flutter web WASM builds
 - **Auto-enabled by default** - Both connectivity and quality monitoring start automatically
+- **State-based UI** - Different screens for initiating, listening, and error states
+- **Connection stability delay** - Prevents flickering from brief network interruptions
 - Global connectivity monitoring using a provider widget
 - **Connection quality assessment** - Real-time latency-based quality monitoring with configurable intervals
 - A simple `ConnectivityFirstApp` widget that rebuilds based on connectivity and quality
@@ -67,15 +69,40 @@ import 'package:connectivity_first/connectivity_first.dart';
 
 ```
 
+### State-Based UI
+
+The `ConnectivityFirstApp` widget now supports state-based UI rendering with different screens for different connectivity phases:
+
+- **`ConnectivityAppState.initiating`** - Initial loading/checking state
+- **`ConnectivityAppState.listening`** - Active monitoring state (normal operation)
+- **`ConnectivityAppState.error`** - Error state when connectivity checks fail
+
+The builder function receives: `(ConnectivityAppState state, bool isOnline, ConnectionQuality quality, String? error)`
+
+### Connection Stability Delay
+
+To prevent UI flickering from brief network interruptions, you can configure a stability delay that waits before confirming offline state changes:
+
+```dart
+ConnectivityFirstProvider(
+  connectionStabilityDelay: const Duration(seconds: 3), // Wait 3 seconds before going offline
+  builder: MyApp(),
+)
+```
+
+- When connection drops, it waits the specified delay before switching to offline
+- If connection recovers within the delay, it stays online
+- Coming back online happens immediately (no delay)
+
 ---
 
 ## Configuration Options
 
 The `ConnectivityFirstProvider` offers several configuration options to customize behavior:
 
-### Auto-Enable Services (New!)
+### Auto-Enable Services
 
-By default, both connectivity monitoring and connection quality monitoring are automatically enabled when you wrap your app with `ConnectivityFirstProvider`. You can control this behavior:
+By default, both connectivity monitoring and connection quality monitoring are automatically enabled. You can control this:
 
 ```dart
 ConnectivityFirstProvider(
@@ -87,6 +114,9 @@ ConnectivityFirstProvider(
   
   // Custom interval for quality checks (default: 10 seconds)
   qualityCheckInterval: const Duration(seconds: 5),
+  
+  // Delay before confirming offline state (default: 3 seconds)
+  connectionStabilityDelay: const Duration(seconds: 3),
   
   onConnectivityRestored: () => print('Internet restored!'),
   onConnectivityLost: () => print('Internet lost!'),
@@ -123,59 +153,65 @@ ConnectivityFirstProvider(
 
 ---
 
-```
+
 
 3. Use `ConnectivityFirstApp` somewhere in your widget tree to rebuild UI based on the current connectivity state and quality:
 
 ```dart
-
   @override
   Widget build(BuildContext context) {
     return ConnectivityFirstApp(
-      builder: (isOnline, quality) => Scaffold(
-        appBar: AppBar(title: const Text('Offline First Example')),
-        body: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Text(
-                isOnline ? 'You are online' : 'You are offline',
-                style: const TextStyle(fontSize: 18),
-              ),
-              const SizedBox(height: 10),
-              Text(
-                'Connection Quality: ${quality.name}',
-                style: TextStyle(
-                  fontSize: 16,
-                  color: _getQualityColor(quality),
-                  fontWeight: FontWeight.bold,
+      builder: (state, isOnline, quality, error) {
+        switch (state) {
+          case ConnectivityAppState.initiating:
+            return const Center(
+              child: CircularProgressIndicator(),
+            );
+          case ConnectivityAppState.error:
+            return Center(
+              child: Text('Error: $error'),
+            );
+          case ConnectivityAppState.listening:
+            return Scaffold(
+              appBar: AppBar(title: const Text('Offline First Example')),
+              body: Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      isOnline ? 'You are online' : 'You are offline',
+                      style: const TextStyle(fontSize: 18),
+                    ),
+                    const SizedBox(height: 10),
+                    Text(
+                      'Connection Quality: ${quality.name}',
+                      style: TextStyle(
+                        fontSize: 16,
+                        color: _getQualityColor(quality),
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+                    ElevatedButton(
+                      onPressed: () {
+                        if (isOnline) {
+                          // refresh UIs or data
+                          ConnectivityFirstCommand.reloadAllUIs(context);
+                        } else {
+                          // try a manual connectivity check
+                          ConnectivityFirstCommand.checkConnectivity(context);
+                        }
+                      },
+                      child: Text(isOnline ? 'Refresh' : 'Check Connection'),
+                    ),
+                  ],
                 ),
               ),
-              const SizedBox(height: 20),
-              ElevatedButton(
-                onPressed: () {
-                  if (isOnline) {
-                    // refresh UIs or data
-                    ConnectivityFirstCommand.reloadAllUIs(context);
-                  } else {
-                    // try a manual connectivity check
-                    ConnectivityFirstCommand.checkConnectivity(context);
-                  }
-                },
-                child: Text(isOnline ? 'Refresh' : 'Check Connection'),
-              ),
-              const SizedBox(height: 10),
-              ElevatedButton(
-                onPressed: () => ConnectivityQualityCommand.checkQuality(context),
-                child: const Text('Check Quality'),
-              ),
-            ],
-          ),
-        ),
-      ),
+            );
+        }
+      },
     );
   }
-
 ```
 
 ---
@@ -284,7 +320,7 @@ Widget build(BuildContext context) {
 
 ### Upgrading from 1.0.x to 2.0.0
 
-**Breaking Change**: The `ConnectivityFirstApp` builder function signature has changed to include connection quality.
+**Breaking Change**: The `ConnectivityFirstApp` builder function signature has changed to include connection quality and state.
 
 **Before (1.0.x):**
 ```dart
@@ -296,17 +332,26 @@ ConnectivityFirstApp(
 **After (2.0.0):**
 ```dart
 ConnectivityFirstApp(
-  builder: (isOnline, quality) => YourWidget(
-    isOnline: isOnline,
-    quality: quality,
-  ),
+  builder: (state, isOnline, quality, error) {
+    switch (state) {
+      case ConnectivityAppState.initiating:
+        return LoadingWidget();
+      case ConnectivityAppState.error:
+        return ErrorWidget(error: error);
+      case ConnectivityAppState.listening:
+        return YourWidget(isOnline: isOnline, quality: quality);
+    }
+  },
 )
 ```
 
-If you don't need quality monitoring, you can simply ignore the `quality` parameter:
+If you don't need the advanced state handling, you can ignore the extra parameters:
 ```dart
 ConnectivityFirstApp(
-  builder: (isOnline, _) => YourWidget(isOnline: isOnline),
+  builder: (_, isOnline, quality, _) => YourWidget(
+    isOnline: isOnline,
+    quality: quality,
+  ),
 )
 ```
 

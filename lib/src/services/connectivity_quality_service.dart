@@ -3,7 +3,7 @@ import 'package:connectivity_first/src/utils/connectivity_logger.dart';
 import 'package:http/http.dart' as http;
 
 /// Enum to represent different connection quality levels
-enum ConnectionQuality { none, poor, fair, good, excellent }
+enum ConnectionQuality { loading, none, poor, fair, good, excellent }
 
 /// Service for measuring and monitoring connection quality
 /// Provides latency-based quality assessment and periodic monitoring
@@ -24,7 +24,7 @@ class ConnectivityQualityService {
       StreamController<ConnectionQuality>.broadcast();
 
   // Current connection quality
-  ConnectionQuality _currentQuality = ConnectionQuality.none;
+  ConnectionQuality _currentQuality = ConnectionQuality.loading;
 
   /// Stream of connection quality changes
   Stream<ConnectionQuality> get qualityStream => _qualityController.stream;
@@ -57,6 +57,10 @@ class ConnectivityQualityService {
   /// Check the initial connection quality
   Future<void> _checkInitialQuality() async {
     try {
+      // Emit loading state before first check
+      _currentQuality = ConnectionQuality.loading;
+      _qualityController.add(_currentQuality);
+
       _currentQuality = await measureConnectionQuality();
       _qualityController.add(_currentQuality);
     } catch (e) {

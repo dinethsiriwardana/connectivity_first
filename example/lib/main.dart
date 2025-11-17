@@ -24,10 +24,10 @@ class MyApp extends StatelessWidget {
         qualityCheckInterval: const Duration(seconds: 5),
 
         // Disable connectivity logging (default: true)
-        loggerConnectivity: false,
+        loggerConnectivity: true,
 
         // Disable quality monitoring logging (default: true)
-        loggerQualityMonitoring: false,
+        loggerQualityMonitoring: true,
 
         onConnectivityRestored: () {
           print('Internet restored!');
@@ -56,6 +56,8 @@ class MyHomePage extends StatelessWidget {
 
   String _getQualityText(ConnectionQuality quality) {
     switch (quality) {
+      case ConnectionQuality.loading:
+        return 'Checking...';
       case ConnectionQuality.none:
         return 'No Connection';
       case ConnectionQuality.poor:
@@ -71,6 +73,8 @@ class MyHomePage extends StatelessWidget {
 
   Color _getQualityColor(ConnectionQuality quality) {
     switch (quality) {
+      case ConnectionQuality.loading:
+        return Colors.grey;
       case ConnectionQuality.none:
         return Colors.red;
       case ConnectionQuality.poor:
@@ -89,56 +93,95 @@ class MyHomePage extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(title: const Text('Offline First Example')),
       body: ConnectivityFirstApp(
-        builder: (isOnline, quality) => Container(
-          alignment: Alignment.center,
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Text(
-                isOnline ? 'You are online' : 'You are offline',
-                textAlign: TextAlign.center,
-                style: const TextStyle(fontSize: 18),
-              ),
-              const SizedBox(height: 10),
-              Text(
-                'Connection Quality: ${_getQualityText(quality)}',
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  fontSize: 16,
-                  color: _getQualityColor(quality),
-                  fontWeight: FontWeight.bold,
+        builder: (state, isOnline, quality, error) {
+          switch (state) {
+            case ConnectivityAppState.initiating:
+              return const Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    CircularProgressIndicator(),
+                    SizedBox(height: 16),
+                    Text('Checking connectivity...'),
+                  ],
                 ),
-              ),
-              const SizedBox(height: 20),
-              ElevatedButton(
-                onPressed: () {
-                  if (isOnline) {
-                    // Perform online action - maybe reload UI to get fresh data
-                    ConnectivityFirstCommand.reloadAllUIs(context);
-                  } else {
-                    // Check connectivity when offline
-                    ConnectivityFirstCommand.checkConnectivity(context);
-                  }
-                },
-                child: Text(isOnline ? 'Refresh' : 'Check Connection'),
-              ),
-              const SizedBox(height: 10),
-              ElevatedButton(
-                onPressed: () =>
-                    ConnectivityQualityCommand.checkQuality(context),
-                child: const Text('Check Quality'),
-              ),
-              if (!isOnline) ...[
-                const SizedBox(height: 10),
-                ElevatedButton(
-                  onPressed: () =>
-                      ConnectivityFirstCommand.restartConnectivity(context),
-                  child: const Text('Restart Connectivity'),
+              );
+            case ConnectivityAppState.error:
+              return Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Icon(Icons.error, color: Colors.red, size: 48),
+                    const SizedBox(height: 16),
+                    const Text('Connectivity Error'),
+                    if (error != null) ...[
+                      const SizedBox(height: 8),
+                      Text(error, textAlign: TextAlign.center),
+                    ],
+                    const SizedBox(height: 16),
+                    ElevatedButton(
+                      onPressed: () {
+                        ConnectivityFirstCommand.checkConnectivity(context);
+                        ConnectivityQualityCommand.checkQuality(context);
+                      },
+                      child: const Text('Retry'),
+                    ),
+                  ],
                 ),
-              ],
-            ],
-          ),
-        ),
+              );
+            case ConnectivityAppState.listening:
+              return Container(
+                alignment: Alignment.center,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      isOnline ? 'You are online' : 'You are offline',
+                      textAlign: TextAlign.center,
+                      style: const TextStyle(fontSize: 18),
+                    ),
+                    const SizedBox(height: 10),
+                    Text(
+                      'Connection Quality: ${_getQualityText(quality)}',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontSize: 16,
+                        color: _getQualityColor(quality),
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+                    ElevatedButton(
+                      onPressed: () {
+                        if (isOnline) {
+                          // Perform online action - maybe reload UI to get fresh data
+                          ConnectivityFirstCommand.reloadAllUIs(context);
+                        } else {
+                          // Check connectivity when offline
+                          ConnectivityFirstCommand.checkConnectivity(context);
+                        }
+                      },
+                      child: Text(isOnline ? 'Refresh' : 'Check Connection'),
+                    ),
+                    const SizedBox(height: 10),
+                    ElevatedButton(
+                      onPressed: () =>
+                          ConnectivityQualityCommand.checkQuality(context),
+                      child: const Text('Check Quality'),
+                    ),
+                    if (!isOnline) ...[
+                      const SizedBox(height: 10),
+                      ElevatedButton(
+                        onPressed: () =>
+                            ConnectivityFirstCommand.restartConnectivity(context),
+                        child: const Text('Restart Connectivity'),
+                      ),
+                    ],
+                  ],
+                ),
+              );
+          }
+        },
       ),
     );
   }

@@ -94,10 +94,10 @@ class _ConnectivityFirstGlobalManagerState
         _previousConnectivityStatus != currentStatus) {
       if (currentStatus) {
         widget.onConnectivityRestored?.call();
-        _showConnectivityMessage(context, 'Connected', Colors.green);
+        // _showConnectivityMessage(context, 'Connected', Colors.green);
       } else {
         widget.onConnectivityLost?.call();
-        _showConnectivityMessage(context, 'No Internet Connection', Colors.red);
+        // _showConnectivityMessage(context, 'No Internet Connection', Colors.red);
       }
     }
 

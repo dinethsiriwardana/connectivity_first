@@ -46,11 +46,10 @@ class ConnectivityFirstProvider extends StatelessWidget {
     return MultiBlocProvider(
       providers: [
         BlocProvider(
-          create: (context) =>
-              ConnectivityFirstBloc(
-                loggerConnectivity: loggerConnectivity,
-                connectionStabilityDelay: connectionStabilityDelay,
-              ),
+          create: (context) => ConnectivityFirstBloc(
+            loggerConnectivity: loggerConnectivity,
+            connectionStabilityDelay: connectionStabilityDelay,
+          ),
         ),
         BlocProvider(
           create: (context) => ConnectivityQualityBloc(

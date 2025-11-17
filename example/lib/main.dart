@@ -176,7 +176,9 @@ class MyHomePage extends StatelessWidget {
                       const SizedBox(height: 10),
                       ElevatedButton(
                         onPressed: () =>
-                            ConnectivityFirstCommand.restartConnectivity(context),
+                            ConnectivityFirstCommand.restartConnectivity(
+                              context,
+                            ),
                         child: const Text('Restart Connectivity'),
                       ),
                     ],

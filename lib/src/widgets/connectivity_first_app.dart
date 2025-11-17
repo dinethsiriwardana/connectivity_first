@@ -18,7 +18,13 @@ enum ConnectivityAppState {
 }
 
 class ConnectivityFirstApp extends StatelessWidget {
-  final Widget Function(ConnectivityAppState state, bool isOnline, ConnectionQuality quality, String? error) builder;
+  final Widget Function(
+    ConnectivityAppState state,
+    bool isOnline,
+    ConnectionQuality quality,
+    String? error,
+  )
+  builder;
 
   const ConnectivityFirstApp({super.key, required this.builder});
 
@@ -28,7 +34,10 @@ class ConnectivityFirstApp extends StatelessWidget {
       builder: (context, connectivityState) {
         return BlocBuilder<ConnectivityQualityBloc, ConnectivityQualityState>(
           builder: (context, qualityState) {
-            final appState = _determineAppState(connectivityState, qualityState);
+            final appState = _determineAppState(
+              connectivityState,
+              qualityState,
+            );
             final isOnline = connectivityState.isOnline;
             final quality = qualityState.quality;
             final error = qualityState.error;

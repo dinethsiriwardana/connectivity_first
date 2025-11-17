@@ -106,7 +106,9 @@ class ConnectivityFirstBloc
           final currentState = state as ConnectivityUpdated;
           if (currentState.status != status ||
               currentState.isLocalMode != isLocalMode) {
-            emit(currentState.copyWith(status: status, isLocalMode: isLocalMode));
+            emit(
+              currentState.copyWith(status: status, isLocalMode: isLocalMode),
+            );
           }
         }
       });

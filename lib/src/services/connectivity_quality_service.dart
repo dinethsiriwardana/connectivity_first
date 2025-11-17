@@ -60,7 +60,7 @@ class ConnectivityQualityService {
       // Emit loading state before first check
       _currentQuality = ConnectionQuality.loading;
       _qualityController.add(_currentQuality);
-      
+
       _currentQuality = await measureConnectionQuality();
       _qualityController.add(_currentQuality);
     } catch (e) {
